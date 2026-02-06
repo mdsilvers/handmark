@@ -21,16 +21,48 @@
 
 ---
 
-## 🚧 Priority 2: Implement Google OAuth (IN PROGRESS)
+## ✅ Priority 2: Implement Google OAuth (COMPLETE)
 
-**Status**: 🔄 In Progress
+**Status**: ✅ Done
+**Completed**: 2026-02-06
 
-### Tasks:
-- [ ] Set up Supabase Auth client in frontend
-- [ ] Create login page with Google OAuth button
-- [ ] Handle auth callback
-- [ ] Create auth context/provider
-- [ ] Add protected route wrapper
+### What was done:
+1. ✅ Created Supabase client (`src/lib/supabase.ts`)
+2. ✅ Created auth types (`src/types/auth.ts`)
+3. ✅ Created auth context & provider (`src/lib/auth-context.tsx`)
+4. ✅ Created login page with Google OAuth button (`src/app/login/page.tsx`)
+5. ✅ Created auth callback handler (`src/app/auth/callback/route.ts`)
+6. ✅ Created protected route wrapper (`src/components/auth/protected-route.tsx`)
+7. ✅ Created Button component (`src/components/ui/button.tsx`)
+8. ✅ Wrapped app with AuthProvider in root layout
+9. ✅ Updated home page to redirect based on auth state
+10. ✅ Created basic dashboard page with auth protection
+
+### ⚠️ IMPORTANT: Supabase Setup Required
+**Before Google OAuth will work, you need to:**
+
+1. Go to Supabase Dashboard: https://supabase.com/dashboard
+2. Navigate to Authentication → Providers
+3. Enable Google provider
+4. Add OAuth credentials:
+   - Go to https://console.cloud.google.com
+   - Create OAuth 2.0 credentials
+   - Add authorized redirect URI: `https://fwkghbxevvmtlaiiwgpj.supabase.co/auth/v1/callback`
+   - Copy Client ID and Client Secret to Supabase
+5. Save settings
+
+**Callback URL configured**: `http://localhost:3000/auth/callback`
+
+### Files created:
+- `src/lib/supabase.ts` — Supabase client
+- `src/lib/auth-context.tsx` — Auth provider & hook
+- `src/lib/utils.ts` — Utility functions (cn helper)
+- `src/types/auth.ts` — Auth TypeScript types
+- `src/components/ui/button.tsx` — Button component
+- `src/components/auth/protected-route.tsx` — Protected route wrapper
+- `src/app/login/page.tsx` — Login page
+- `src/app/auth/callback/route.ts` — OAuth callback handler
+- `src/app/dashboard/page.tsx` — Basic dashboard (temporary)
 
 ---
 

@@ -1,17 +1,26 @@
+'use client'
+
+import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { useAuth } from '@/lib/auth-context'
+
 export default function HomePage() {
+  const { user, loading } = useAuth()
+  const router = useRouter()
+
+  useEffect(() => {
+    if (!loading) {
+      if (user) {
+        router.push('/dashboard')
+      } else {
+        router.push('/login')
+      }
+    }
+  }, [user, loading, router])
+
   return (
-    <main className="min-h-screen bg-gray-50 flex items-center justify-center">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold text-gray-900 mb-4">
-          ✋ HandMark
-        </h1>
-        <p className="text-lg text-gray-600">
-          AI-Powered Grading for K-12 Teachers
-        </p>
-        <p className="text-sm text-gray-500 mt-4">
-          Frontend scaffold ready. Start building!
-        </p>
-      </div>
+    <main className="min-h-screen bg-[#0F0D15] flex items-center justify-center">
+      <div className="text-white text-lg">Redirecting...</div>
     </main>
   )
 }
