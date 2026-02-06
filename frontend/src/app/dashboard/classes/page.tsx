@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { ProtectedRoute } from '@/components/auth/protected-route'
 import { DashboardLayout } from '@/components/dashboard/dashboard-layout'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -14,39 +15,57 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
-
-interface Class {
-  id: string
-  name: string
-  gradeLevel: string
-  subject: string
-  studentCount: number
-}
+import { Spinner } from '@/components/ui/spinner'
+import { useClasses } from '@/hooks/useClasses'
 
 function ClassesContent() {
-  const [classes, setClasses] = useState<Class[]>([])
+  const { classes, loading, error, createClass } = useClasses()
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
+  const [creating, setCreating] = useState(false)
   const [newClass, setNewClass] = useState({
     name: '',
-    gradeLevel: '',
+    grade_level: '',
     subject: '',
   })
 
-  const handleCreateClass = () => {
-    if (!newClass.name || !newClass.gradeLevel || !newClass.subject) {
+  const handleCreateClass = async () => {
+    if (!newClass.name || !newClass.grade_level || !newClass.subject) {
       alert('Please fill in all fields')
       return
     }
 
-    const classObj: Class = {
-      id: Date.now().toString(),
-      ...newClass,
-      studentCount: 0,
-    }
+    setCreating(true)
+    const result = await createClass(newClass)
+    setCreating(false)
 
-    setClasses([...classes, classObj])
-    setNewClass({ name: '', gradeLevel: '', subject: '' })
-    setIsCreateModalOpen(false)
+    if (result) {
+      setNewClass({ name: '', grade_level: '', subject: '' })
+      setIsCreateModalOpen(false)
+    }
+  }
+
+  if (loading) {
+    return (
+      <DashboardLayout>
+        <div className="flex items-center justify-center py-16">
+          <Spinner size="lg" />
+        </div>
+      </DashboardLayout>
+    )
+  }
+
+  if (error) {
+    return (
+      <DashboardLayout>
+        <Card>
+          <CardContent className="py-8">
+            <div className="text-center text-red-400">
+              Error loading classes: {error}
+            </div>
+          </CardContent>
+        </Card>
+      </DashboardLayout>
+    )
   }
 
   return (
@@ -90,24 +109,23 @@ function ClassesContent() {
           // Classes Grid
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {classes.map((classItem) => (
-              <Card key={classItem.id} className="hover:border-purple-500/50 transition-colors cursor-pointer">
-                <CardHeader>
-                  <CardTitle>{classItem.name}</CardTitle>
-                  <CardDescription>
-                    {classItem.gradeLevel} • {classItem.subject}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-center justify-between">
-                    <div className="text-sm text-gray-400">
-                      {classItem.studentCount} students
+              <Link key={classItem.id} href={`/dashboard/classes/${classItem.id}`}>
+                <Card className="hover:border-purple-500/50 transition-colors cursor-pointer h-full">
+                  <CardHeader>
+                    <CardTitle>{classItem.name}</CardTitle>
+                    <CardDescription>
+                      {classItem.grade_level} • {classItem.subject}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex items-center justify-between">
+                      <div className="text-sm text-gray-400">
+                        View roster →
+                      </div>
                     </div>
-                    <Button variant="ghost" size="sm">
-                      View →
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
+                  </CardContent>
+                </Card>
+              </Link>
             ))}
           </div>
         )}
@@ -133,6 +151,7 @@ function ClassesContent() {
                   onChange={(e) =>
                     setNewClass({ ...newClass, name: e.target.value })
                   }
+                  disabled={creating}
                 />
               </div>
 
@@ -142,10 +161,11 @@ function ClassesContent() {
                 </label>
                 <Input
                   placeholder="e.g., 5th Grade"
-                  value={newClass.gradeLevel}
+                  value={newClass.grade_level}
                   onChange={(e) =>
-                    setNewClass({ ...newClass, gradeLevel: e.target.value })
+                    setNewClass({ ...newClass, grade_level: e.target.value })
                   }
+                  disabled={creating}
                 />
               </div>
 
@@ -159,6 +179,7 @@ function ClassesContent() {
                   onChange={(e) =>
                     setNewClass({ ...newClass, subject: e.target.value })
                   }
+                  disabled={creating}
                 />
               </div>
             </div>
@@ -167,10 +188,20 @@ function ClassesContent() {
               <Button
                 variant="outline"
                 onClick={() => setIsCreateModalOpen(false)}
+                disabled={creating}
               >
                 Cancel
               </Button>
-              <Button onClick={handleCreateClass}>Create Class</Button>
+              <Button onClick={handleCreateClass} disabled={creating}>
+                {creating ? (
+                  <>
+                    <Spinner size="sm" className="mr-2" />
+                    Creating...
+                  </>
+                ) : (
+                  'Create Class'
+                )}
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>

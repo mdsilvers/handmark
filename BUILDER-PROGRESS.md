@@ -115,18 +115,54 @@
 
 ---
 
-## ⏳ Priority 4: Class Management (TODO)
+## ✅ Priority 4: Class Management (COMPLETE)
 
-**Status**: ⏳ Not Started
+**Status**: ✅ Done
+**Completed**: 2026-02-06
 
-### Tasks:
-- [ ] Create class modal
-  - Name, grade level, subject inputs
-  - Save to Supabase
-- [ ] Class detail page
-  - Student roster (table view)
-  - Add student manually
-  - CSV import for bulk roster
+### What was done:
+1. ✅ Created TypeScript types for database entities
+2. ✅ Built custom hooks for Supabase integration
+   - `useClasses()` — fetch, create, delete classes
+   - `useStudents()` — fetch, add, bulk add, delete students
+3. ✅ Integrated classes page with Supabase
+   - Real-time data persistence
+   - Loading and error states
+   - Create class modal saves to database
+4. ✅ Created class detail page (`/dashboard/classes/[id]`)
+   - Student roster table view
+   - Add student manually (name, email, student ID)
+   - CSV import for bulk roster
+   - Remove students
+   - Back navigation
+5. ✅ CSV Import functionality
+   - Paste CSV data (Name, Email, Student ID)
+   - Simple parser with header row
+   - Bulk insert to database
+   - Progress indicators
+
+### Features:
+- **Classes**: Create, list, navigate to detail
+- **Students**: Add individually or via CSV import
+- **Roster Table**: Clean table view with name, email, student ID
+- **Remove Students**: Confirm dialog before deletion
+- **Loading States**: Spinners during async operations
+- **Error Handling**: User-friendly error messages
+
+### Files created:
+- `src/types/database.ts` — Database entity types
+- `src/hooks/useClasses.ts` — Classes CRUD hook
+- `src/hooks/useStudents.ts` — Students CRUD hook
+- `src/app/dashboard/classes/[id]/page.tsx` — Class detail page
+
+### Files modified:
+- `src/app/dashboard/classes/page.tsx` — Supabase integration
+
+### ⚠️ Database Setup Required:
+**Before this will work, you need to:**
+1. Run `database/schema.sql` in Supabase SQL Editor
+2. This will create the required tables: `users`, `classes`, `students`, etc.
+3. Enable Row Level Security (RLS) policies (optional for dev)
 
 ---
 
