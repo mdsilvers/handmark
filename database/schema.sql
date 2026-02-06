@@ -1,4 +1,4 @@
--- GradeBot Database Schema
+-- HandMark Database Schema
 -- PostgreSQL 15+ (Supabase)
 
 -- Enable UUID extension

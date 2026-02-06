@@ -1,4 +1,4 @@
-# GradeBot - AI-Powered Grading for K-12 Teachers
+# HandMark - AI-Powered Grading for K-12 Teachers
 
 **Status:** Phase 1B - Design & Architecture Complete  
 **Next Step:** Implementation begins Week 3 (see Phase1-Implementation-Plan.md)
@@ -75,8 +75,8 @@ uvicorn app.main:app --reload  # Starts on http://localhost:8000
 
 # Option 2: Local Postgres
 psql -U postgres
-CREATE DATABASE gradebot;
-\c gradebot
+CREATE DATABASE handmark;
+\c handmark
 \i database/schema.sql
 ```
 
