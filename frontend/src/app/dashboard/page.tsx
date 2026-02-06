@@ -1,46 +1,85 @@
 'use client'
 
 import { ProtectedRoute } from '@/components/auth/protected-route'
-import { useAuth } from '@/lib/auth-context'
+import { DashboardLayout } from '@/components/dashboard/dashboard-layout'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import Link from 'next/link'
 
 function DashboardContent() {
-  const { user, signOut } = useAuth()
-
   return (
-    <div className="min-h-screen bg-[#0F0D15]">
-      {/* Temporary Header */}
-      <header className="bg-white/5 border-b border-white/10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-bold text-white">
-              ✋ <span className="text-purple-500">Hand</span>Mark
-            </h1>
-            <div className="flex items-center gap-4">
-              <div className="text-white">
-                {user?.email}
-              </div>
-              <Button onClick={signOut} variant="outline">
-                Sign Out
-              </Button>
-            </div>
-          </div>
+    <DashboardLayout>
+      <div className="space-y-6">
+        {/* Welcome Header */}
+        <div>
+          <h2 className="text-3xl font-bold text-white">Dashboard</h2>
+          <p className="text-gray-400 mt-1">
+            Welcome back! Here's an overview of your grading activity.
+          </p>
         </div>
-      </header>
 
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="text-center text-white space-y-4">
-          <h2 className="text-3xl font-bold">Welcome to HandMark! 🎉</h2>
-          <p className="text-gray-400">
-            Authentication is working! The dashboard is under construction.
-          </p>
-          <p className="text-sm text-gray-500">
-            Coming soon: Classes, Assignments, and AI-powered grading
-          </p>
+        {/* Quick Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Total Classes</CardTitle>
+              <div className="text-3xl font-bold text-purple-400">0</div>
+            </CardHeader>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Assignments</CardTitle>
+              <div className="text-3xl font-bold text-purple-400">0</div>
+            </CardHeader>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Graded This Week</CardTitle>
+              <div className="text-3xl font-bold text-purple-400">0</div>
+            </CardHeader>
+          </Card>
         </div>
-      </main>
-    </div>
+
+        {/* Quick Actions */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Quick Actions</CardTitle>
+            <CardDescription>Get started with HandMark</CardDescription>
+          </CardHeader>
+          <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <Link href="/dashboard/classes">
+              <Button variant="outline" className="w-full h-auto py-4 flex flex-col items-start">
+                <div className="text-2xl mb-2">📚</div>
+                <div className="font-semibold">Create Your First Class</div>
+                <div className="text-xs text-gray-400 mt-1">
+                  Set up a class to start grading
+                </div>
+              </Button>
+            </Link>
+            <Button variant="outline" className="w-full h-auto py-4 flex flex-col items-start" disabled>
+              <div className="text-2xl mb-2">📝</div>
+              <div className="font-semibold">Create Assignment</div>
+              <div className="text-xs text-gray-400 mt-1">
+                Add a new assignment to grade
+              </div>
+            </Button>
+          </CardContent>
+        </Card>
+
+        {/* Recent Activity */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Recent Activity</CardTitle>
+            <CardDescription>Your latest grading sessions</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="text-center py-8 text-gray-400">
+              No activity yet. Create a class to get started!
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </DashboardLayout>
   )
 }
 
