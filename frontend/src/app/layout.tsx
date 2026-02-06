@@ -5,7 +5,7 @@ import './globals.css'
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 
 export const metadata: Metadata = {
-  title: 'GradeBot - AI-Powered Grading for K-12 Teachers',
+  title: 'HandMark - AI-Powered Grading for K-12 Teachers',
   description: 'Grade handwritten assignments in 30 seconds with AI-powered grading trusted by teachers.',
 }
 
