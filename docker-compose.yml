@@ -1,0 +1,109 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database (for local development)
+  postgres:
+    image: postgres:15-alpine
+    container_name: handmark-postgres
+    environment:
+      POSTGRES_USER: handmark
+      POSTGRES_PASSWORD: handmark_dev_password
+      POSTGRES_DB: handmark_dev
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U handmark"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis (for Celery queue + caching)
+  redis:
+    image: redis:7-alpine
+    container_name: handmark-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend (FastAPI)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: handmark-backend
+    environment:
+      DATABASE_URL: postgresql://handmark:handmark_dev_password@postgres:5432/handmark_dev
+      REDIS_URL: redis://redis:6379/0
+      SUPABASE_URL: ${SUPABASE_URL}
+      SUPABASE_KEY: ${SUPABASE_KEY}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      JWT_SECRET: handmark_dev_secret_change_in_production
+      ENVIRONMENT: development
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+      - /app/.venv  # Exclude venv from bind mount
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+  # Celery Worker
+  celery-worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: handmark-celery-worker
+    environment:
+      DATABASE_URL: postgresql://handmark:handmark_dev_password@postgres:5432/handmark_dev
+      REDIS_URL: redis://redis:6379/0
+      SUPABASE_URL: ${SUPABASE_URL}
+      SUPABASE_KEY: ${SUPABASE_KEY}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      ENVIRONMENT: development
+    depends_on:
+      - postgres
+      - redis
+    volumes:
+      - ./backend:/app
+      - /app/.venv
+    command: celery -A app.tasks.celery_app worker --loglevel=info
+
+  # Frontend (Next.js)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: handmark-frontend
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:8000
+      NEXT_PUBLIC_WS_URL: ws://localhost:8000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules  # Exclude node_modules from bind mount
+      - /app/.next
+    command: npm run dev
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  default:
+    name: handmark-network
